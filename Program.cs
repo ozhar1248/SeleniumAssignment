@@ -19,7 +19,7 @@ namespace AssignmentOz
         static Dictionary<string, string> hashVarData; // hash table that maps variable name in column 1 from excel file
                                                 // to the value that appears in column 2
 
-        static void ReadDataToArray()
+        static void ReadData()
         {
             
             xlApp = new Microsoft.Office.Interop.Excel.Application();
@@ -29,14 +29,12 @@ namespace AssignmentOz
             xlRange = xlWorksheet.UsedRange;
 
             int rowCount = xlRange.Rows.Count;
-            //int colCount = xlRange.Columns.Count;
 
             for (int i = 1; i <= rowCount; i++)
             {
                 if (xlRange.Cells[i, 2] != null && xlRange.Cells[i, 2].Value2 != null)
                 {
                     hashVarData.Add(xlRange.Cells[i, 1].Value2.ToString(), xlRange.Cells[i, 2].Value2.ToString());
-                    //myAL.Add(xlRange.Cells[i, 2].Value2.ToString());
                 }
             }
 
@@ -46,19 +44,12 @@ namespace AssignmentOz
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            //rule of thumb for releasing com objects:
-            //  never use two dots, all COM objects must be referenced and released individually
-            //  ex: [somthing].[something].[something] is bad
-
-            //release com objects to fully kill excel process from running in the background
             Marshal.ReleaseComObject(xlRange);
             Marshal.ReleaseComObject(xlWorksheet);
 
-            //close and release
             xlWorkbook.Close();
             Marshal.ReleaseComObject(xlWorkbook);
 
-            //quit and release
             xlApp.Quit();
             Marshal.ReleaseComObject(xlApp);
         }
@@ -105,7 +96,7 @@ namespace AssignmentOz
         static void Main(string[] args)
         {
             hashVarData = new Dictionary<string, string>();
-            ReadDataToArray();
+            ReadData();
             CloseData();
             WebDriver driver = Login();
             CheckLoginTime(driver);
