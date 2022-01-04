@@ -65,6 +65,7 @@ namespace AssignmentOz
         static void CheckLoginTime(WebDriver driver)
         {
             long time1 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            long time2;
             bool found = false;
             while (!found)
             {
@@ -74,16 +75,25 @@ namespace AssignmentOz
                 }
                 catch (Exception e)
                 {
-                    continue;
+                    time2 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+                    if (time2 - time1 >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
+                    {
+                        throw new Exception("time of login is over 10 seconds");
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                    
                 }
                 found = true;
             }
-            long time2 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            Console.WriteLine("time-> " + (time2 - time1));
-            if (time2-time1 >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
+            time2 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            if (time2 - time1 >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
             {
                 throw new Exception("time of login is over 10 seconds");
             }
+
         }
 
         static void CheckLogout(WebDriver driver)
