@@ -24,7 +24,6 @@ namespace AssignmentOz
             
             xlApp = new Microsoft.Office.Interop.Excel.Application();
             string path = Directory.GetCurrentDirectory();
-            Console.WriteLine(path);
             xlWorkbook = xlApp.Workbooks.Open(path+"\\data.xlsx");
             xlWorksheet = xlWorkbook.Sheets[1];
             xlRange = xlWorksheet.UsedRange;
