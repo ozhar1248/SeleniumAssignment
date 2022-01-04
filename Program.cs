@@ -64,7 +64,6 @@ namespace AssignmentOz
         }
         static void CheckLoginTime(WebDriver driver)
         {
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"])));
             long time1 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
             bool found = false;
             while (!found)
