@@ -66,8 +66,21 @@ namespace AssignmentOz
         {
             WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"])));
             long time1 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            wait.Until(ExpectedConditions.ElementIsVisible(By.Id(hashVarData["ID_ACCOUNT_LINK"])));
+            bool found = false;
+            while (!found)
+            {
+                try
+                {
+                    driver.FindElement(By.Id(hashVarData["ID_ACCOUNT_LINK"]));
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+                found = true;
+            }
             long time2 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+            Console.WriteLine("time-> " + (time2 - time1));
             if (time2-time1 >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
             {
                 throw new Exception("time of login is over 10 seconds");
