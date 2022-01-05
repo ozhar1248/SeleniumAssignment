@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace AssignmentOz
 {
@@ -16,10 +17,14 @@ namespace AssignmentOz
         static Microsoft.Office.Interop.Excel.Workbook xlWorkbook;
         static Microsoft.Office.Interop.Excel._Worksheet xlWorksheet;
         static Microsoft.Office.Interop.Excel.Range xlRange;
-        static Dictionary<string, string> hashVarData; // hash table that maps variable name in column 1 from excel file
-                                                // to the value that appears in column 2
 
-        static void ReadData()
+        // hash table that maps variable name in column 1 from excel file
+        // to the value that appears in column 2
+        // For example, hashVarData["URL"] is the value of URL in Excel file
+        static Dictionary<string, string> hashVarData; 
+                    
+
+        static void ReadDataFromExcel()
         {
             
             xlApp = new Microsoft.Office.Interop.Excel.Application();
@@ -39,7 +44,7 @@ namespace AssignmentOz
             }
 
         }
-        static void CloseData()
+        static void CloseExcel()
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
@@ -62,38 +67,27 @@ namespace AssignmentOz
             driver.FindElement(By.Id(hashVarData["ID_BUTTON_LOGIN"])).Click();
             return driver;
         }
+
         static void CheckLoginTime(WebDriver driver)
         {
-            long time1 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            long time2;
-            bool found = false;
-            while (!found)
+            long start = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; ;
+            while (true)
             {
+                long now = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; ;
+                if (now - start >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
+                {
+                    throw new Exception("time of login is over 10 seconds");
+                }
                 try
                 {
                     driver.FindElement(By.Id(hashVarData["ID_ACCOUNT_LINK"]));
                 }
                 catch (Exception e)
                 {
-                    time2 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-                    if (time2 - time1 >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
-                    {
-                        throw new Exception("time of login is over 10 seconds");
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                    
+                    continue;
                 }
-                found = true;
+                break;
             }
-            time2 = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
-            if (time2 - time1 >= Int32.Parse(hashVarData["TIME_TO_LOAD_SECONDS"]) * 1000)
-            {
-                throw new Exception("time of login is over 10 seconds");
-            }
-
         }
 
         static void CheckLogout(WebDriver driver)
@@ -118,8 +112,8 @@ namespace AssignmentOz
         static void Main(string[] args)
         {
             hashVarData = new Dictionary<string, string>();
-            ReadData();
-            CloseData();
+            ReadDataFromExcel();
+            CloseExcel();
             WebDriver driver = Login();
             CheckLoginTime(driver);
             CheckLogout(driver);
